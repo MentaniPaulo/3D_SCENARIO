@@ -3,8 +3,18 @@
 #include <sstream>
 #include <string>
 
-ShaderCompiler::ShaderCompiler(){
+ShaderCompiler::ShaderCompiler(std::vector<Shaders> Shaders_list){
+    if( Shaders_list.size() == 0){
+        std::cerr << "missing shaders" << std::endl;
+        return;
+    }
 
+    for(int i = 0; i < Shaders_list.size(); i++){
+        all_shaders.push_back(Shaders_list[i]);
+        all_shaders[i].id = LoadSharder(all_shaders[i].filepath, all_shaders[i].kind);
+    }
+
+    m_Shader_id = CreateShader();
 }
 ShaderCompiler::~ShaderCompiler(){
 
@@ -12,13 +22,19 @@ ShaderCompiler::~ShaderCompiler(){
 unsigned int ShaderCompiler::LoadSharder(std::string filepath, ShaderKind kind){
 
     std::string program_file = parse(filepath);
-    const char* program_file_str = program_file.c_str();
+    unsigned int id = 0;
+    
     if(kind == Vertex){
-        //unsigned int vs = CompileShader(GL_VERTEX_SHADER, program_file_str);
+        id = compilerShader(program_file, GL_VERTEX_SHADER);
     }
-    return 0;    
+    if(kind == Fragmented){
+        id = compilerShader(program_file, GL_VERTEX_SHADER);
+    }
+
+
+    return id;    
 }
-unsigned int ShaderCompiler::compilerShader(std::string &program, unsigned int type){
+unsigned int ShaderCompiler::compilerShader(std::string program, unsigned int type){
     
     unsigned int id = 0;
     const char *src = program.c_str();
@@ -42,8 +58,20 @@ unsigned int ShaderCompiler::compilerShader(std::string &program, unsigned int t
 }
 
 unsigned int ShaderCompiler::CreateShader(){
+    unsigned int program = glCreateProgram();
 
-    return 0;
+    for(int i = 0; i < all_shaders.size(); i++){
+        glAttachShader(program, all_shaders[i].id);
+    }
+
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    for(int i = 0; i < all_shaders.size(); i++){
+        glDeleteShader(all_shaders[i].id);
+    }
+
+    return program;
 }
 
 std::string ShaderCompiler::parse(std::string filepath){

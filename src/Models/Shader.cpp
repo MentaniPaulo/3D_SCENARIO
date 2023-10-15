@@ -28,7 +28,7 @@ unsigned int ShaderCompiler::LoadSharder(std::string filepath, ShaderKind kind){
         id = compilerShader(program_file, GL_VERTEX_SHADER);
     }
     if(kind == Fragmented){
-        id = compilerShader(program_file, GL_VERTEX_SHADER);
+        id = compilerShader(program_file, GL_FRAGMENT_SHADER);
     }
 
 
@@ -36,22 +36,23 @@ unsigned int ShaderCompiler::LoadSharder(std::string filepath, ShaderKind kind){
 }
 unsigned int ShaderCompiler::compilerShader(std::string program, unsigned int type){
     
-    unsigned int id = 0;
     const char *src = program.c_str();
-
-    GLCall(id = glCreateShader(type));
+    unsigned int id = glCreateShader(type);
+    
     GLCall(glShaderSource(id, 1, &src, nullptr));
-
+    glCompileShader(id);
     int result;
+    
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
-    if(result == GL_FALSE){
+    if (result == GL_FALSE) {
         int size;
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &size);
         char* message = new char[size];
         glGetShaderInfoLog(id, size, &size, &message[0]);
         std::cerr << "Fail to compile shader" << std::endl;
         std::cerr << message << std::endl;
+        delete message;
     }
 
     return id; 

@@ -20,10 +20,15 @@ unsigned int IB0_principal;
 void initial_configuration(){
 
     //load shader file
+    Shaders Fragmented;
+    Fragmented.filepath = "D:\\Dev_Software\\C++\\3D_scenario\\src\\Shaders\\Fragmented\\FragmentedShader.shader";
+    Fragmented.kind = ShaderKind::Fragmented;
 
-    ShaderCompiler shaders;
+    Shaders Vertex;
+    Fragmented.filepath = "D:\\Dev_Software\\C++\\3D_scenario\\src\\Shaders\\Vertex\\VertexShaders.shader";
+    Fragmented.kind = ShaderKind::Vertex;
 
-    shaders.LoadSharder("D:\\Dev_Software\\C++\\3D_scenario\\src\\Shaders\\Fragmented\\FragmentedShader.shader", ShaderKind::Fragmented);
+    ShaderCompiler shaders({Fragmented, Vertex});
 
     VertexBuffer form(&positions, sizeof(positions));
 
